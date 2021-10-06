@@ -1,52 +1,45 @@
-import { from, of } from "rxjs";
+import { from, map, reduce, scan } from "rxjs";
 
-const observer = {
-    next: value => console.log('next:', value),
-    complete: () => console.log('complete')
-};
+const numbers = [1,2,3,4,5,6];
 
-const  myGenerator = function*() {
-    yield 1;
-    yield 2;
-    yield 3;
-    yield 4;
-    yield 5;
-};
+const totalAccumulator = (acc, cur) => acc + cur;
 
-const myIterable = myGenerator();
 
-// for (const iterator of myIterable) {
-//     console.log(iterator);    
-// }
+// Reduce
+from(numbers).pipe(
+    reduce(totalAccumulator, 0)
+)
+.subscribe(console.log);
 
-from(myIterable).subscribe(observer);
 
-// const source$ = from([1,2,3,4,5]);
-// const source$ = of(...[1,2,3,4,5]);
+/// Scan
+from(numbers).pipe(
+    scan(totalAccumulator, 0)
+)
+.subscribe(console.log);
 
-//const source$ = from('Fernando');
-//Result
-// next: F
-// next: e
-// next: r
-// next: n
-// next: a
-// next: n
-// next: d
-// next: o
-// complete
+// Redux 
+interface User {
+    id?: string,
+    authenticated?: boolean,
+    token?: string,
+    age?: number
+}
+const user : User[] = [
+    {id: 'fher', authenticated: false, token: null},
+    {id: 'fher', authenticated: false, token: 'ABC'},
+    {id: 'fher', authenticated: false, token: 'ABC123'},
+];
 
-// const source$ = of('Fernando');
-// Result
-// next: Fernando
 
-const source$ = from(fetch('https://api.github.com/users/klerith'));
+const state$ = from(user).pipe(
+    scan<User, User>( (acc, cur) => {
+        return {...acc,...cur}
+    },{ age: 33})
+);
 
-// source$.subscribe(async(response) => {
-//     console.log(response.url);
-//         const dataResponse = await response.json();
-//         console.log(dataResponse);
-        
-    
-// });
+const id$ = state$.pipe(
+    map(state =>  state)
+);
 
+id$.subscribe(console.log);
