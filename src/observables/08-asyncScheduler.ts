@@ -11,7 +11,6 @@ const greet2 = name => console.log(`Hola ${name}`);
 
 const subscription = asyncScheduler.schedule(function (state) {
     console.log('state', state);
-
     this.schedule(state +1, 1000);
 }, 3000, 0);
 
